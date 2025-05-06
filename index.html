@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Happy Birthday Surprise!</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      padding-top: 100px;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    #loading {
+      font-size: 2em;
+      margin-bottom: 40px;
+      animation: loadingAnimation 2s infinite;
+    }
+
+    @keyframes loadingAnimation {
+      0% { color: #00ff00; }
+      50% { color: #fff; }
+      100% { color: #00ff00; }
+    }
+
+    #finalMessage {
+      font-size: 2em;
+      margin-top: 40px;
+      display: none;
+      color: #fff;
+      text-shadow: 2px 2px 10px rgba(0, 255, 0, 0.7);
+    }
+
+    button {
+      background-color: transparent;
+      border: 2px solid #00ff00;
+      color: #00ff00;
+      padding: 10px 20px;
+      font-size: 1.2em;
+      margin-top: 20px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #00ff00;
+      color: #000;
+    }
+
+    .profile-images {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .profile-images img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 4px solid #00ff00;
+      box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+      transition: transform 0.3s ease;
+    }
+
+    .profile-images img:hover {
+      transform: scale(1.1);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      padding-top: 100px;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-content {
+      background-color: #111;
+      color: #00ff00;
+      padding: 30px;
+      margin: auto;
+      width: 60%;
+      text-align: center;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+      animation: modalEffect 1.5s forwards;
+    }
+
+    @keyframes modalEffect {
+      0% { opacity: 0; transform: scale(0); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .close {
+      color: #aaa;
+      font-size: 28px;
+      font-weight: bold;
+      float: right;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: #00ff00;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    #stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    #hearts {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .heart {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: pink;
+      transform: rotate(45deg);
+      animation: floatUp 2s ease-out forwards;
+    }
+
+    .heart::before,
+    .heart::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: pink;
+      border-radius: 50%;
+    }
+
+    .heart::before { top: -10px; left: 0; }
+    .heart::after { left: -10px; top: 0; }
+
+    @keyframes floatUp {
+      0% {opacity: 1; transform: translateY(0) scale(1);}
+      100% {opacity: 0; transform: translateY(-200px) scale(1.5);}
+    }
+
+    @keyframes flash {
+      0%, 100% { color: #00ff00; }
+      50% { color: #fff; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="stars"></canvas>
+  <audio id="bgMusic" src="happy-birthday-334876.mp3" loop></audio>
+
+  <div id="loading">⌨️ กำลังโหลดระบบเซอร์ไพรส์วันเกิด...</div>
+  <button onclick="surprise()">🎁 คลิกเพื่อเริ่มเซอร์ไพรส์ 🎉</button>
+
+  <div class="profile-images">
+    <img src="2ec79e11-36a6-4cd9-9b53-d5c595615d1a.jpg">
+    <img src="4c326c15-e07d-4f20-9571-bfbb80344bc4.jpg">
+  </div>
+  
+  <div id="finalMessage"></div>
+  <div id="hearts"></div>
+
+  <div id="myModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2>🎉 สุขสันต์วันเกิด 🎂</h2>
+      <p>หวังว่าในปีนี้พี่ๆจะมีความสุขมาก ๆ สุขภาพแข็งแรง การเงินร่ำรวย! 🎁</p>
+      <button onclick="resetPage()">คลิกเพื่อรีเซ็ตความสุข 🎉</button>
+    </div>
+  </div>
+
+  <script>
+    function surprise() {
+      document.getElementById("bgMusic").play();
+      setTimeout(() => displayMessage("🎉 สุขสันต์วันเกิดครับโผมมม 🎉"), 500);
+      setTimeout(() => displayMessage("📅 วันนี้คือวันพิเศษ..."), 3500);
+      setTimeout(() => displayMessage("🎂 สุขสันต์วันเกิดนะครับ พี่ซิม พี่แบงค์!"), 6500);
+      setTimeout(() => displayMessage("💻 ขอให้ปีนี้เป็นปีที่ดี สุขภาพแข็งแลนๆ 😆"), 9500);
+      setTimeout(() => displayMessage("🧠 ขอให้การเงินไหลมา เบียร์เข้าท้องแทนน้ำเปล่า!"), 12500);
+      setTimeout(() => displayMessage("🎁 แม้ไม่มีของขวัญให้ ก็ขอให้พี่ๆ มีความสุข ขอให้ได้รับแต่สิ่งดีๆเข้ามาในชีวิต hbd รวยๆ เฮงๆ คร้าบ 😉"), 15500);
+      setTimeout(typeMessage, 18500);  // เพิ่มเวลาเล็กน้อย
+    }
+
+    function displayMessage(message) {
+      const final = document.getElementById("finalMessage");
+      final.style.display = "block";
+      final.innerHTML = "";
+      [...message].forEach((char, index) => {
+        const span = document.createElement("span");
+        span.textContent = char;
+        span.style.animation = `flash 1.5s infinite`;
+        span.style.animationDelay = `${index * 0.2}s`;  // เพิ่มความช้าของการแสดงข้อความ
+        final.appendChild(span);
+      });
+    }
+
+    const msg = "🎊 โหลดสำเร็จ! ระบบอวยพรทำงานสมบูรณ์ ขอให้มีความสุขมาก ๆ ทั้งปีนะคร้าบบ!";
+    let i = 0;
+
+    function typeMessage() {
+      const final = document.getElementById("finalMessage");
+      final.innerHTML = "";
+      const interval = setInterval(() => {
+        final.innerHTML += msg.charAt(i);
+        i++;
+        if (i >= msg.length) {
+          clearInterval(interval);
+          showModal();
+        }
+      }, 150);  // ปรับความเร็วให้ช้าลง
+    }
+
+    function showModal() {
+      const modal = document.getElementById("myModal");
+      modal.style.display = "block";
+      for (let i = 0; i < 20; i++) {
+        const heart = document.createElement("div");
+        heart.classList.add("heart");
+        heart.style.left = Math.random() * window.innerWidth + "px";
+        document.getElementById("hearts").appendChild(heart);
+        setTimeout(() => heart.remove(), 2000);
+      }
+    }
+
+    function closeModal() {
+      const modal = document.getElementById("myModal");
+      modal.style.display = "none";
+    }
+
+    function resetPage() {
+      location.reload();
+    }
+
+    // ดวงดาว
+    const canvas = document.getElementById("stars");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let stars = Array(200).fill().map(() => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.5,
+      dx: (Math.random() - 0.5) * 0.5,
+      dy: (Math.random() - 0.5) * 0.5,
+    }));
+
+    function drawStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#00ff00";
+      stars.forEach(star => {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+        ctx.fill();
+        star.x += star.dx;
+        star.y += star.dy;
+        if (star.x < 0 || star.x > canvas.width) star.dx *= -1;
+        if (star.y < 0 || star.y > canvas.height) star.dy *= -1;
+      });
+      requestAnimationFrame(drawStars);
+    }
+    drawStars();
+  </script>
+</body>
+</html>
